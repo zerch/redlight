@@ -1,7 +1,5 @@
 /*
- *  Change the code to accept parameters for MAX_DATA and MAX_ROWS, store 
- *  them in the Database struct, and write that to the file, thus creating 
- *  a database that can be arbitrarily sized.
+ Add more operations you can do on the database, like find.
  */
 
 #include <stdio.h>
@@ -43,19 +41,19 @@ void die(const char *message, struct Connection *conn)
 
 void Address_print(struct Address *addr)
 {
-    printf("%d %s %s\n", addr->id, addr->name, addr->email);
+    printf("%d %s %s\n",
+            addr->id, addr->name, addr->email);
 }
 
 void Database_load(struct Connection *conn)
 {
-
     if (fread(&conn->db->max_rows, sizeof(int), 1, conn->file) != 1)
         die("Failed to load database.", conn);
     if (fread(&conn->db->max_data, sizeof(int), 1, conn->file) != 1)
         die("Failed to load database.", conn);
  
-    conn->db->rows = malloc((sizeof(int) * 2) 
-            + (sizeof(char) * conn->db->max_data * 2) 
+    conn->db->rows = malloc((sizeof(int) * 2) \
+            + (sizeof(char) * conn->db->max_data * 2) \
             * conn->db->max_rows);
    
     int i = 0;
@@ -68,12 +66,11 @@ void Database_load(struct Connection *conn)
             die("Failed to load Database", conn);
 
         addr->name = malloc(sizeof(char) * conn->db->max_data);
-        if (fread(addr->name, sizeof(char) * conn->db->max_data
+        if (fread(addr->name, sizeof(char) * conn->db->max_data\
                     , 1, conn->file) != 1)
             die("Failed to load Database", conn);
-        
         addr->email = malloc(sizeof(char) * conn->db->max_data);
-        if (fread(addr->email, sizeof(char) * conn->db->max_data
+        if (fread(addr->email, sizeof(char) * conn->db->max_data\
                     , 1, conn->file) != 1)
             die("Failed to load Database", conn);
     }
@@ -132,10 +129,10 @@ void Database_write(struct Connection *conn)
         if (fwrite(&addr->set, sizeof(int), 1, conn->file) != 1)
             die("Failed to write database", conn);
 
-        if (fwrite(addr->name, sizeof(char) * conn->db->max_data
+        if (fwrite(addr->name, sizeof(char) * conn->db->max_data\
                     , 1, conn->file) != 1)
             die("Failed to write database", conn);
-        if (fwrite(addr->email, sizeof(char) * conn->db->max_data
+        if (fwrite(&addr->set, sizeof(char) * conn->db->max_data\
                     , 1, conn->file) != 1)
             die("Failed to write database", conn);
     }
@@ -147,8 +144,8 @@ void Database_create(struct Connection *conn)
     int max_data = conn->db->max_data;
     int max_rows = conn->db->max_rows;   
     int i = 0;
-
-    conn->db->rows = malloc((sizeof(int) * 2) 
+    
+    conn->db->rows = malloc((sizeof(int) * 2) \
             + (sizeof(char) * max_data * 2) * max_rows);
 
     for (i = 0; i < max_rows; i++) {
@@ -159,8 +156,7 @@ void Database_create(struct Connection *conn)
     }
 }
 
-void Database_set(struct Connection *conn, int id, const char *name
-        , const char *email)
+void Database_set(struct Connection *conn, int id, const char *name, const char *email)
 {
     int max_data = conn->db->max_data;
     struct Address *addr = &conn->db->rows[id];
@@ -211,6 +207,16 @@ void Database_list(struct Connection *conn)
     }
 }
 
+void Database_find(struct Connection *conn, char *name)
+{
+    int i = 0;
+    for (i = 0; i < conn->db->max_rows; i++) {
+        struct Address *addr = &conn->db->rows[i];
+        if (strstr(addr->name, name) || strstr(addr->email, name))
+                    Database_get(conn, addr->id);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     char *filename = argv[1];
@@ -221,8 +227,8 @@ int main(int argc, char *argv[])
     if (argc < 3) die("USAGE: ex17 <dbfile> <action> [action params]", conn);
    
     int id = 0;
-    
-    if (action != 'c' && argc > 3) {
+
+    if (action != 'c' && action != 'f' && argc > 3) {
         id = atoi(argv[3]);
         if (id >= conn->db->max_rows)
             die("There are not that many records.", conn);
@@ -260,6 +266,11 @@ int main(int argc, char *argv[])
 
         case 'l':
             Database_list(conn);
+            break;
+
+        case 'f':
+            if (argc != 4) die("Need a search token", conn);
+            Database_find(conn, argv[3]);
             break;
         default:
             die("Invalid action, only: c=create, g=get, s=set, d=del\
