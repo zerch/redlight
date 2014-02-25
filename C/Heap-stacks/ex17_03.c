@@ -41,8 +41,7 @@ void die(const char *message, struct Connection *conn)
 
 void Address_print(struct Address *addr)
 {
-    printf("%d %s %s\n",
-            addr->id, addr->name, addr->email);
+    printf("%d %s %s\n", addr->id, addr->name, addr->email);
 }
 
 void Database_load(struct Connection *conn)
@@ -52,8 +51,8 @@ void Database_load(struct Connection *conn)
     if (fread(&conn->db->max_data, sizeof(int), 1, conn->file) != 1)
         die("Failed to load database.", conn);
  
-    conn->db->rows = malloc((sizeof(int) * 2) \
-            + (sizeof(char) * conn->db->max_data * 2) \
+    conn->db->rows = malloc((sizeof(int) * 2) 
+            + (sizeof(char) * conn->db->max_data * 2) 
             * conn->db->max_rows);
    
     int i = 0;
@@ -66,11 +65,11 @@ void Database_load(struct Connection *conn)
             die("Failed to load Database", conn);
 
         addr->name = malloc(sizeof(char) * conn->db->max_data);
-        if (fread(addr->name, sizeof(char) * conn->db->max_data\
+        if (fread(addr->name, sizeof(char) * conn->db->max_data
                     , 1, conn->file) != 1)
             die("Failed to load Database", conn);
         addr->email = malloc(sizeof(char) * conn->db->max_data);
-        if (fread(addr->email, sizeof(char) * conn->db->max_data\
+        if (fread(addr->email, sizeof(char) * conn->db->max_data
                     , 1, conn->file) != 1)
             die("Failed to load Database", conn);
     }
@@ -129,10 +128,10 @@ void Database_write(struct Connection *conn)
         if (fwrite(&addr->set, sizeof(int), 1, conn->file) != 1)
             die("Failed to write database", conn);
 
-        if (fwrite(addr->name, sizeof(char) * conn->db->max_data\
+        if (fwrite(addr->name, sizeof(char) * conn->db->max_data
                     , 1, conn->file) != 1)
             die("Failed to write database", conn);
-        if (fwrite(&addr->set, sizeof(char) * conn->db->max_data\
+        if (fwrite(addr->email, sizeof(char) * conn->db->max_data
                     , 1, conn->file) != 1)
             die("Failed to write database", conn);
     }
@@ -144,8 +143,8 @@ void Database_create(struct Connection *conn)
     int max_data = conn->db->max_data;
     int max_rows = conn->db->max_rows;   
     int i = 0;
-    
-    conn->db->rows = malloc((sizeof(int) * 2) \
+
+    conn->db->rows = malloc((sizeof(int) * 2) 
             + (sizeof(char) * max_data * 2) * max_rows);
 
     for (i = 0; i < max_rows; i++) {
@@ -156,7 +155,8 @@ void Database_create(struct Connection *conn)
     }
 }
 
-void Database_set(struct Connection *conn, int id, const char *name, const char *email)
+void Database_set(struct Connection *conn, int id, const char *name
+        , const char *email)
 {
     int max_data = conn->db->max_data;
     struct Address *addr = &conn->db->rows[id];
