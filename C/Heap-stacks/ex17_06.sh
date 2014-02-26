@@ -32,10 +32,7 @@ function test_ex17 {
     printf "\n--Cleaning up.\n"
     make clean
     dats=`ls | grep -e ".dat"`
-    if [ -n "$dats" ]; then
-        printf "\n--Cleaning databases\n"
-        rm -vf $dats
-    fi
+    ( test -n "$dats" && ( printf "\n--Cleaning databases\n"; rm -vf $dats ) )
     return 0
 }
 
