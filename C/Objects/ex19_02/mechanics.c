@@ -1,10 +1,7 @@
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 #include <assert.h>
-#include "ex19.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "mechanics.h"
 
 int Monster_attack(void *self, int damage)
 {
@@ -36,11 +33,6 @@ int Monster_init(void *self)
     monster->hit_points = 10;
     return 1;
 }
-
-Object MonsterProto = {
-    .init = Monster_init,
-    .attack = Monster_attack
-};
 
 void *Room_move(void *self, Direction direction)
 {
@@ -98,11 +90,6 @@ int Room_attack(void *self, int damage)
     }
 }
 
-Object RoomProto = {
-    .move = Room_move,
-    .attack = Room_attack
-};
-
 void *Map_move(void *self, Direction direction)
 {
     assert(self != NULL);
@@ -136,52 +123,6 @@ int Map_attack(void *self, int damage)
 
     return location->_(attack)(location, damage);
 }
-
-int Map_init(void *self)
-{
-    assert(self != NULL);
-
-    Map *map = self;
-    assert(map != NULL);
-
-    // make some rooms for a small map
-    Room *hall = NEW(Room, "The great Hall");
-    assert(hall != NULL);
-
-    Room *throne = NEW(Room, "The throne room");
-    assert(throne != NULL);
-
-    Room *arena = NEW(Room, "The arena, with the Minotaur");
-    assert(arena != NULL);
-
-    Room *kitchen = NEW(Room, "Kitchen, you have the knife now");
-    assert(kitchen != NULL);
-
-    // put the bad guy in the arena
-    arena->bad_guy = NEW(Monster, "The evil Minotaur");
-
-    // setup the map rooms
-    hall->north = throne;
-
-    throne->west = arena;
-    throne->east = kitchen;
-    throne->south = hall;
-
-    arena->east = throne;
-    kitchen->west = throne;
-
-    // start the map and the character off in the hall
-    map->start = hall;
-    map->location = hall;
-    
-    return 1;
-}
-
-Object MapProto = {
-    .init = Map_init,
-    .move = Map_move,
-    .attack = Map_attack
-};
 
 int process_input(Map *game, char input)
 {
@@ -240,27 +181,5 @@ int process_input(Map *game, char input)
     return 1;
 }
 
-int main(int argc, char *argv[])
-{
-    // simple way to setup the randomness
-    srand(time(NULL));
 
-    // make our map to work with
-    Map *game = NEW(Map, "The Hall of the Minotaur.");
-    assert(game != NULL);
 
-    printf("You enter the ");
-    game->location->_(describe)(game->location);
-    
-    if (argc > 1) {
-        int i = 1;
-        for (i = 1; i < argc; i++) {
-            process_input(game, argv[i][0]);
-        }
-    } else {
-        while(process_input(game, '\0')) 
-        {}
-    }
-
-    return 0;
-}
