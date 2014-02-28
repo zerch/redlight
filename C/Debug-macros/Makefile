@@ -7,6 +7,4 @@ OBJS:=${SRCS:%.c=%.o}
 clean:
 	rm -f ${EXECS} ${OBJS}
 
-ex19: object.o mechanics.o
-test:
-	./test.sh
+ex20: ex20.o

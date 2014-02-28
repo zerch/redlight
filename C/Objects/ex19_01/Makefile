@@ -7,8 +7,6 @@ OBJS:=${SRCS:%.c=%.o}
 clean:
 	rm -f ${EXECS} ${OBJS}
 
-all: ${EXECS}
-
 ex19: object.o
 test:
 	./test.sh
