@@ -1,0 +1,736 @@
+
+Available Data Types
+
+int
+    Stores a regular integer, defaulting to 32 bits in size.
+double
+    Holds a large floating point number.
+float
+    Holds a smaller floating point number.
+char
+    Holds a single 1 byte character.
+void
+    Indicates "no type" and used to say a function returns nothing, or a pointer has no type as in void *thing.
+enum
+    Enumerated types, work as integers, convert to integers, but give you symbolic names for sets. Some compilers will warn you when you don't cover all elements of an enum in switch-statements.
+
+Type Modifiers
+
+unsigned
+    Changes the type so that it does not have negative numbers, giving you a larger upper bound but nothing lower than 0.
+signed
+    Gives you negative and positive numbers, but halves your upper bound in exchange for the same lower bound negative.
+long
+    Uses a larger storage for the type so that it can hold bigger numbers, usually doubling the current size.
+short
+    Uses smaller storage for the type so it stores less, but takes half the space.
+
+
+
+Type Qualifiers
+
+const
+    Indicates the variable won't change after being initialized.
+volatile
+    Indicates that all bets are off, and the compiler should leave this alone and try not to do any fancy optimizations to it. You usually only need this if you're doing really weird stuff to your variables.
+register
+    Forces the compiler to keep this variable in a register, and the compiler can just ignore you. These days compilers are better at figuring out where to put variables, so only use this if you actually can measure it improving the speed.
+
+
+
+Type Conversion
+
+C uses a sort of "stepped type promotion" mechanism, where it looks at two operands on either side of an expression, and promotes the smaller side to match the larger side before doing the operation. If one side of an expression is on this list, then the other side is converted to that type before the operation is done, and this goes in this order:
+
+    long double
+    double
+    float
+    int (but only char and short int);
+    long
+
+If you find yourself trying to figure out how your conversions are working in an expression, then don't leave it to the compiler. Use explicit casting operations to make it exactly what you want. For example, if you have:
+
+long + char - int * double
+
+Rather than trying to figure out if it will be converted to double correctly, just use casts:
+
+(double)long - (double)char - (double)int * double
+
+Putting the type you want in parenthesis before the variable name is how you force it into the type you really need. The important thing though is always promote up, not down. Don't cast long into char unless you know what you're doing.
+
+
+Type Sizes
+
+The stdint.h defines both a set of typdefs for exact sized integer types, as well as a set of macros for the sizes of all the types. This is easier to work with than the older limits.h since it is consistent. The types defined are:
+
+int8_t
+    8 bit signed integer.
+uint8_t
+    8 bit unsigned integer.
+int16_t
+    16 bit signed integer.
+uint16_t
+    16 bit unsigned integer.
+int32_t
+    32 bit signed integer.
+uint32_t
+    32 bit unsigned integer.
+int64_t
+    64 bit signed integer.
+uint64_t
+    64 bit unsigned integer.
+
+The pattern here is of the form (u)int(BITS)_t where a u is put in front to indicate "unsigned", then BITS is a number for the number of bits. This pattern is then repeated for macros that return the maximum values of these types:
+
+INT(N)_MAX
+    Maximum positive number of the signed integer of bits (N), such as INT16_MAX.
+INT(N)_MIN
+    Minimum negative number of signed integer of bits (N).
+UINT(N)_MAX
+    Maximum positive number of unsigned integer of bits (N). Since it's unsigned the minimum is 0 and can't have a negative value.
+
+Warning
+
+Pay attention! Do not go looking for a literal INT(N)_MAX definition in any header file. I'm using the (N) as a placeholder for any number of bits your platform currently supports. This (N) could be any number, 8, 16, 32, 64, even maybe 128. I use this notation in this exercise so that I don't have to literally write out every possible combination.
+
+There are also macros in stdint.h for sizes of the size_t type, integers large enough to hold pointers, and other handy size defining macros. Compilers have to at least have these, and then they can allow other larger types.
+
+Here is a full list should be in stdint.h:
+
+int_least(N)_t
+    holds at least (N) bits.
+uint_least(N)_t
+    holds at least (N) bits unsigned.
+INT_LEAST(N)_MAX
+    max value of the matching least (N) type.
+INT_LEAST(N)_MIN
+    min value of the matching least (N) type.
+UINT_LEAST(N)_MAX
+    unsigned maximum of the matching (N) type.
+int_fast(N)_t
+    similar to int_least*N*_t but asking for the "fastest" with at least that precision.
+uint_fast(N)_t
+    unsigned fastest least integer.
+INT_FAST(N)_MAX
+    max value of the matching fastest (N) type.
+INT_FAST(N)_MIN
+    min value of the matching fastest (N) type.
+UINT_FAST(N)_MAX
+    unsigned max value of the matching fastest (N) type.
+intptr_t
+    a signed integer large enough to hold a pointer.
+uintptr_t
+    an unsigned integer large enough to hold a pointer.
+INTPTR_MAX
+    max value of a intptr_t.
+INTPTR_MIN
+    min value of a intptr_t.
+UINTPTR_MAX
+    unsigned max value of a uintptr_t.
+intmax_t
+    biggest number possible on that system.
+uintmax_t
+    biggest unsigned number possible.
+INTMAX_MAX
+    largest value for the biggest signed number.
+INTMAX_MIN
+    smallest value for the biggest signed number.
+UINTMAX_MAX
+    largest value for the biggest unsigned number.
+PTRDIFF_MIN
+    minimum value of ptrdiff_t.
+PTRDIFF_MAX
+    maximum value of ptrdiff_t.
+SIZE_MAX
+    maximum of a size_t.
+
+Available Operators
+
+This is a comprehensive list of all the operators you have in the C language. In this list, I'm indicating the following:
+
+(binary)
+    The operator has a left and right: X + Y.
+(unary)
+    The operator is on its own: -X.
+(prefix)
+    The operator comes before the variable: ++X.
+(postfix)
+
+    Usually the same as the (prefix) version, but placing it
+
+    after gives it a different meaning: X++.
+(ternary)
+
+    There's only one of these, so it's actually called the
+
+    ternary but it means "three operands": X ? Y : Z.
+
+Math Operators
+
+These are your basic math operations, plus I put () in with these since it calls a function and is close to a "math" operation.
+
+()
+    Function call.
+* (binary)
+    multiply.
+/
+    divide.
++ (binary)
+    addition.
++ (unary)
+    positive number.
+++ (postfix)
+    read, then increment.
+++ (prefix)
+    increment, then read.
+-- (postfix)
+    read, then decrement.
+-- (prefix)
+    decrement, then read.
+- (binary)
+    subtract.
+- (unary)
+    negative number.
+
+Data Operators
+
+These are used to access data in different ways and forms.
+
+->
+    struct pointer access.
+.
+    struct value access.
+[]
+    Array index.
+sizeof
+    size of a type or variable.
+& (unary)
+    Address of.
+* (unary)
+    Value of.
+
+Logic Operators
+
+These handle testing equality and inequality of variables.
+
+!=
+    does not equal.
+<
+    less than.
+<=
+    less than or equal.
+==
+    equal (not assignment).
+>
+    greater than.
+>=
+    greater than or equal.
+
+Bit Operators
+
+These are more advanced and for shifting and modifying the raw bits in integers.
+
+& (binary)
+    Bitwise and.
+<<
+    Shift left.
+>>
+    Shift right.
+^
+    bitwise xor (exclusive or).
+|
+    bitwise or.
+~
+    compliment (flips all the bits).
+
+Boolean Operators
+
+Used in truth testing. Study the ternary operator carefully, it is very handy.
+
+!
+    not.
+&&
+    and.
+||
+    or.
+?:
+    Ternary truth test, read X ? Y : Z as "if X then Y else Z".
+
+Assignment Operators
+
+Compound assignment operators that assign a value, and/or perform an operation at the same time. Most of the above operations can also be combined into a compound assignment operator.
+
+=
+    assign.
+%=
+    modulus assign.
+&=
+    bitwise and assign.
+*=
+    multiply assign.
++=
+    plus assign.
+-=
+    minus assign.
+/=
+    divide assign.
+<<=
+    shift left, assign.
+>>=
+    shift right, assign.
+^=
+    bitwise xor, assign.
+|=
+    bitwise or, assign.
+
+Available Control Structures
+
+There's a few control structures you haven't encountered yet:
+
+do-while
+
+    do { ... } while(X); First does the code in the block, then
+
+    tests the X expression before exiting.
+break
+    Put this in a loop, and it breaks out ending it early.
+continue
+    Stops the body of a loop and jumps to the test so it can continue.
+goto
+
+    Jumps to a spot in the code where you've placed a label:, and
+
+    you've been using this in the dbg.h macros to go to the error: label.
+
+Extra Credit
+
+    Read stdint.h or a description of it and write out all the possible available size identifiers.
+    Go through each item here and write out what it does in code. Research it so you know you got it right by looking it up online.
+    Get this information solid as well by making flash cards and spending 15 minutes a day memorizing it.
+    Create a program that prints out examples of each type and confirm that your research is right.
+
+NAME
+stdint.h - integer types
+
+SYNOPSIS
+#include <stdint.h>
+
+DESCRIPTION
+Some  of  the  functionality  described on this reference page extends the ISO C standard.
+Applications shall define the appropriate feature test macro (see  the  System  Interfaces
+volume  of  IEEE Std 1003.1-2001,  Section 2.2, The Compilation Environment) to enable the
+visibility of these symbols in this header.
+
+The <stdint.h> header shall declare sets of integer types  having  specified  widths,  and
+shall define corresponding sets of macros. It shall also define macros that specify limits
+of integer types corresponding to types defined in other standard headers.
+
+Note:  The "width" of an integer type is the number of bits used to store its value  in	a
+   pure  binary  system;  the  actual type may use more bits than that (for example, a
+   28-bit type could be stored in 32 bits of actual storage). An N-bit signed type has
+   values  in  the range -2**N-1 or 1-2**N-1 to 2**N-1-1, while an N-bit unsigned type
+   has values in the range 0 to 2**N-1.
+
+Types are defined in the following categories:
+
+* Integer types having certain exact widths
+
+* Integer types having at least certain specified widths
+
+* Fastest integer types having at least certain specified widths
+
+* Integer types wide enough to hold pointers to objects
+
+* Integer types having greatest width
+
+(Some of these types may denote the same type.)
+
+Corresponding macros specify limits of the declared  types  and	construct  suitable  con-
+stants.
+
+For  each  type	described  herein that the implementation provides, the <stdint.h> header
+shall declare that typedef name and define the associated  macros.  Conversely,	for  each
+type  described	herein	that  the  implementation does not provide, the <stdint.h> header
+shall not declare that typedef name, nor shall it define the associated macros.	An imple-
+mentation shall provide those types described as required, but need not provide any of the
+others (described as optional).
+
+Integer Types
+When typedef names differing only in the absence or presence of the initial u are defined,
+they   shall   denote  corresponding  signed  and  unsigned  types  as  described  in  the
+ISO/IEC 9899:1999 standard, Section 6.2.5; an implementation providing one of these corre-
+sponding types shall also provide the other.
+
+In the following descriptions, the symbol N represents an unsigned decimal integer with no
+leading zeros (for example, 8 or 24, but not 04 or 048).
+
+* Exact-width integer types
+
+The typedef name int N _t designates a signed integer type with width N, no padding  bits,
+and  a  two's-complement representation. Thus, int8_t denotes a signed integer type with a
+width of exactly 8 bits.
+
+The typedef name uint N _t designates  an  unsigned  integer  type  with  width	N.  Thus,
+uint24_t denotes an unsigned integer type with a width of exactly 24 bits.
+
+The following types are required:
+
+int8_t
+int16_t
+int32_t
+uint8_t
+uint16_t
+uint32_t
+
+If  an  implementation  provides integer types with width 64 that meet these requirements,
+then the following types are required: int64_t uint64_t
+
+In particular, this will be the case if any of the following are true:
+
+    * The implementation supports the _POSIX_V6_ILP32_OFFBIG  programming  environment
+  and  the  application	is  being built in the _POSIX_V6_ILP32_OFFBIG programming
+  environment (see the Shell and Utilities volume  of  IEEE Std 1003.1-2001,  c99,
+  Programming Environments).
+
+    * The implementation supports the _POSIX_V6_LP64_OFF64 programming environment and
+  the application is being built in the _POSIX_V6_LP64_OFF64 programming  environ-
+  ment.
+
+    * The  implementation  supports the _POSIX_V6_LPBIG_OFFBIG programming environment
+  and the application is being built  in  the  _POSIX_V6_LPBIG_OFFBIG  programming
+  environment.
+
+All other types of this form are optional.
+
+* Minimum-width integer types
+
+The  typedef name int_least N _t designates a signed integer type with a width of at least
+N, such that no signed integer type with lesser size has at  least  the	specified  width.
+Thus, int_least32_t denotes a signed integer type with a width of at least 32 bits.
+
+The  typedef  name  uint_least N _t designates an unsigned integer type with a width of at
+least N, such that no unsigned integer type with lesser size has at  least  the	specified
+width.  Thus,  uint_least16_t denotes an unsigned integer type with a width of at least 16
+bits.
+
+The following types are required: int_least8_t int_least16_t  int_least32_t  int_least64_t
+uint_least8_t uint_least16_t uint_least32_t uint_least64_t
+
+All other types of this form are optional.
+
+* Fastest minimum-width integer types
+
+Each  of the following types designates an integer type that is usually fastest to operate
+with among all integer types that have at least the specified width.
+
+The designated type is not guaranteed to be fastest for all purposes; if  the  implementa-
+tion  has  no  clear  grounds for choosing one type over another, it will simply pick some
+integer type satisfying the signedness and width requirements.
+
+The typedef name int_fast N _t designates the fastest signed integer type with a width  of
+at  least  N. The typedef name uint_fast N _t designates the fastest unsigned integer type
+with a width of at least N.
+
+The following types  are  required:  int_fast8_t  int_fast16_t  int_fast32_t  int_fast64_t
+uint_fast8_t uint_fast16_t uint_fast32_t uint_fast64_t
+
+All other types of this form are optional.
+
+* Integer types capable of holding object pointers
+
+The  following  type  designates  a  signed  integer type with the property that any valid
+pointer to void can be converted to this type, then converted back to a pointer	to  void,
+and the result will compare equal to the original pointer: intptr_t
+
+The  following  type  designates an unsigned integer type with the property that any valid
+pointer to void can be converted to this type, then converted back to a pointer	to  void,
+and the result will compare equal to the original pointer: uintptr_t
+
+On  XSI-conformant  systems,  the  intptr_t and uintptr_t types are required;   otherwise,
+they are optional.
+
+* Greatest-width integer types
+
+The following type designates a signed integer type capable of representing any	value  of
+any signed integer type: intmax_t
+
+The  following  type designates an unsigned integer type capable of representing any value
+of any unsigned integer type: uintmax_t
+
+These types are required.
+
+Note:  Applications can test for optional types by using  the  corresponding  limit  macro
+   from Limits of Specified-Width Integer Types .
+
+Limits of Specified-Width Integer Types
+The  following  macros specify the minimum and maximum limits of the types declared in the
+<stdint.h> header. Each macro name corresponds to a similar type name in Integer Types .
+
+Each instance of any defined macro shall be replaced by a constant expression suitable for
+use in #if preprocessing directives, and this expression shall have the same type as would
+an expression that is an object of the corresponding type converted according to the inte-
+ger promotions. Its implementation-defined value shall be equal to or greater in magnitude
+(absolute value) than the corresponding value given below,  with  the  same  sign,  except
+where stated to be exactly the given value.
+
+* Limits of exact-width integer types
+
+* Minimum values of exact-width signed integer types:
+
+{INTN_MIN}
+  Exactly -(2 **N-1)
+
+* Maximum values of exact-width signed integer types:
+
+{INTN_MAX}
+  Exactly 2**N-1 -1
+
+* Maximum values of exact-width unsigned integer types:
+
+{UINTN_MAX}
+  Exactly 2 **N -1
+
+* Limits of minimum-width integer types
+
+* Minimum values of minimum-width signed integer types:
+
+{INT_LEASTN_MIN}
+  -(2 ** N-1 -1)
+
+* Maximum values of minimum-width signed integer types:
+
+{INT_LEASTN_MAX}
+  2 ** N-1 -1
+
+* Maximum values of minimum-width unsigned integer types:
+
+{UINT_LEASTN_MAX}
+  2 ** N -1
+
+* Limits of fastest minimum-width integer types
+
+* Minimum values of fastest minimum-width signed integer types:
+
+{INT_FASTN_MIN}
+  -(2 ** N-1 -1)
+
+* Maximum values of fastest minimum-width signed integer types:
+
+{INT_FASTN_MAX}
+  2 ** N-1 -1
+
+* Maximum values of fastest minimum-width unsigned integer types:
+
+{UINT_FASTN_MAX}
+  2 ** N -1
+
+* Limits of integer types capable of holding object pointers
+
+* Minimum value of pointer-holding signed integer type:
+
+{INTPTR_MIN}
+  -(2 ** 15 -1)
+
+* Maximum value of pointer-holding signed integer type:
+
+{INTPTR_MAX}
+  2 ** 15 -1
+
+* Maximum value of pointer-holding unsigned integer type:
+
+{UINTPTR_MAX}
+  2 ** 16 -1
+
+* Limits of greatest-width integer types
+
+* Minimum value of greatest-width signed integer type:
+
+{INTMAX_MIN}
+  -(2 ** 63 -1)
+
+* Maximum value of greatest-width signed integer type:
+
+{INTMAX_MAX}
+  2 ** 63 -1
+
+* Maximum value of greatest-width unsigned integer type:
+
+{UINTMAX_MAX}
+  2 ** 64 -1
+
+Limits of Other Integer Types
+The following macros specify the minimum and maximum limits of integer types corresponding
+to types defined in other standard headers.
+
+Each instance of these macros shall be replaced by a constant expression suitable for  use
+in  #if preprocessing directives, and this expression shall have the same type as would an
+expression that is an object of the corresponding type converted according to the  integer
+promotions.  Its  implementation-defined  value	shall be equal to or greater in magnitude
+(absolute value) than the corresponding value given below, with the same sign.
+
+* Limits of ptrdiff_t:
+
+{PTRDIFF_MIN}
+   -65535
+
+{PTRDIFF_MAX}
+   +65535
+
+* Limits of sig_atomic_t:
+
+{SIG_ATOMIC_MIN}
+   See below.
+
+{SIG_ATOMIC_MAX}
+   See below.
+
+* Limit of size_t:
+
+{SIZE_MAX}
+   65535
+
+* Limits of wchar_t:
+
+{WCHAR_MIN}
+   See below.
+
+{WCHAR_MAX}
+   See below.
+
+* Limits of wint_t:
+
+{WINT_MIN}
+   See below.
+
+{WINT_MAX}
+   See below.
+
+If sig_atomic_t (see the <signal.h> header) is defined as a signed integer type, the value
+of  {SIG_ATOMIC_MIN} shall be no greater than -127 and the value of {SIG_ATOMIC_MAX} shall
+be no less than 127; otherwise, sig_atomic_t shall be defined as an unsigned integer type,
+and the value of {SIG_ATOMIC_MIN} shall be 0 and the value of {SIG_ATOMIC_MAX} shall be no
+less than 255.
+
+If wchar_t (see the <stddef.h> header) is defined as a signed integer type, the	value  of
+{WCHAR_MIN}  shall  be  no greater than -127 and the value of {WCHAR_MAX} shall be no less
+than 127; otherwise, wchar_t shall be defined as an unsigned integer type, and  the  value
+of {WCHAR_MIN} shall be 0 and the value of {WCHAR_MAX} shall be no less than 255.
+
+If  wint_t  (see  the  <wchar.h> header) is defined as a signed integer type, the value of
+{WINT_MIN} shall be no greater than -32767 and the value of {WINT_MAX} shall  be  no  less
+than  32767; otherwise, wint_t shall be defined as an unsigned integer type, and the value
+of {WINT_MIN} shall be 0 and the value of {WINT_MAX} shall be no less than 65535.
+
+Macros for Integer Constant Expressions
+The following macros expand to integer  constant  expressions  suitable	for  initializing
+objects	that  have integer types corresponding to types defined in the <stdint.h> header.
+Each macro name corresponds to a similar type  name  listed  under  Minimum-width  integer
+types and Greatest-width integer types.
+
+Each  invocation  of  one  of  these macros shall expand to an integer constant expression
+suitable for use in #if preprocessing directives. The type of the  expression  shall  have
+the same type as would an expression that is an object of the corresponding type converted
+according to the integer promotions.  The value of the expression shall	be  that  of  the
+argument.
+
+The  argument  in  any  instance of these macros shall be a decimal, octal, or hexadecimal
+constant with a value that does not exceed the limits for the corresponding type.
+
+* Macros for minimum-width integer constant expressions
+
+The macro INTN_C( value) shall expand to an integer constant expression	corresponding  to
+the  type  int_least  N	_t. The macro UINTN_C( value) shall expand to an integer constant
+expression corresponding to the type uint_least N _t. For example, if uint_least64_t is	a
+name  for  the  type  unsigned long long, then UINT64_C(0x123) might expand to the integer
+constant 0x123ULL.
+
+* Macros for greatest-width integer constant expressions
+
+The following macro expands to an integer constant expression having the  value	specified
+by its argument and the type intmax_t: INTMAX_C(value)
+
+The  following  macro expands to an integer constant expression having the value specified
+by its argument and the type uintmax_t: UINTMAX_C(value)
+
+The following sections are informative.
+
+APPLICATION USAGE
+None.
+
+RATIONALE
+The <stdint.h> header is a subset of the <inttypes.h> header  more  suitable  for  use  in
+freestanding  environments,  which  might not support the formatted I/O functions. In some
+environments, if the formatted conversion support is not wanted, using this header instead
+of the <inttypes.h> header avoids defining such a large number of macros.
+
+As a consequence of adding int8_t, the following are true:
+
+* A byte is exactly 8 bits.
+
+* {CHAR_BIT}  has  the	value 8, {SCHAR_MAX} has the value 127, {SCHAR_MIN} has the value
+-127 or -128, and {UCHAR_MAX} has the value 255.
+
+FUTURE DIRECTIONS
+typedef names beginning with int or uint and ending with _t may	be  added  to  the  types
+defined	in  the <stdint.h> header. Macro names beginning with INT or UINT and ending with
+_MAX, _MIN, or _C may be added to the macros defined in the <stdint.h> header.
+
+SEE ALSO
+<inttypes.h> , <signal.h> , <stddef.h> , <wchar.h>
+
+COPYRIGHT
+Portions of this text are reprinted and	reproduced  in	electronic  form  from	IEEE  Std
+1003.1,	2003  Edition,	Standard  for Information Technology -- Portable Operating System
+Interface (POSIX), The Open Group Base Specifications Issue 6, Copyright (C) 2001-2003  by
+the  Institute  of  Electrical  and  Electronics Engineers, Inc and The Open Group. In the
+event of any discrepancy between this version and the original IEEE  and  The  Open  Group
+Standard, the original IEEE and The Open Group Standard is the referee document. The orig-
+inal Standard can be obtained online at http://www.opengroup.org/unix/online.html .
+
+
+________Volatile________
+In C, and consequently C++, the volatile keyword was intended to[1]
+
+    allow access to memory mapped devices
+    allow uses of variables between setjmp and longjmp
+    allow uses of sig_atomic_t variables in signal handlers.
+
+Operations on volatile variables are not atomic, nor do they establish a proper happens-before relationship for threading. This is according to the relevant standards (C, C++, POSIX, WIN32),[2] and this is the matter of fact for the vast majority of current implementations. Thus, the usage of volatile keyword as a portable synchronization mechanism is discouraged by many C/C++ groups.[3][4][5]
+Example of memory-mapped I/O in C
+
+In this example, the code sets the value stored in foo to 0. It then starts to poll that value repeatedly until it changes to 255:
+
+static int foo;
+ 
+void bar(void) {
+    foo = 0;
+ 
+    while (foo != 255)
+         ;
+}
+
+An optimizing compiler will notice that no other code can possibly change the value stored in foo, and will assume that it will remain equal to 0 at all times. The compiler will therefore replace the function body with an infinite loop similar to this:
+
+void bar_optimized(void) {
+    foo = 0;
+ 
+    while (true)
+         ;
+}
+
+However, foo might represent a location that can be changed by other elements of the computer system at any time, such as a hardware register of a device connected to the CPU. The above code would never detect such a change; without the volatile keyword, the compiler assumes that the current program is the only part of the system that could change the value (which is by far the most common situation).
+
+To prevent the compiler from optimizing code as above, the volatile keyword is used:
+
+static volatile int foo;
+ 
+void bar (void) {
+    foo = 0;
+ 
+    while (foo != 255)
+        ;
+}
+
+With this modification the loop condition will not be optimized away, and the system will detect the change when it occurs.
+
+
