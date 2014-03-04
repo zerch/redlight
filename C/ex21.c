@@ -4,6 +4,9 @@
  */
 #include <stdint.h>
 #include <stdio.h>
+#include <stddef.h>
+#include <signal.h>
+#include <wctype.h>
 
 int main (int argc, char **argv)
 {
@@ -223,5 +226,111 @@ int main (int argc, char **argv)
     printf("\nuintmax_t int has max size of:\t%lu", uintmax_max);
 
     printf("\n\n---Other size limits---");
+    // ptrdiff_t is defined in stddef.h
+    ptrdiff_t ptrdiff_min = PTRDIFF_MIN;
+    ptrdiff_t ptrdiff_max = PTRDIFF_MAX;
+    printf("\nptrdiff_t int has max size of:\t%ld", ptrdiff_max);
+    printf("\nptrdiff_t int has min size of:\t%ld", ptrdiff_min);
+    
+    sig_atomic_t sig_atomic_min = SIG_ATOMIC_MIN;
+    sig_atomic_t sig_atomic_max = SIG_ATOMIC_MAX;
+    printf("\nsig_atomic_t has max size of:\t%d", sig_atomic_max);
+    printf("\nsig_atomic_t has min size of:\t%d", sig_atomic_min);
+    
+    wchar_t wchar_min = WCHAR_MIN;
+    wchar_t wchar_max = WCHAR_MAX;
+    printf("\nwchar_t has max size of:\t%d", wchar_max);
+    printf("\nwcahr_t has min size of:\t%d", wchar_min);
+    
+    wint_t wint_min = WINT_MIN;
+    wint_t wint_max = WINT_MAX;
+    // wint_t is unsigned
+    printf("\nwint_t has max size of:\t%u", wint_max);
+    printf("\nwint_t has min size of:\t%u", wint_min);
+    
+    // size_t is also unsigned
+    size_t size_max = SIZE_MAX;
+    printf("\nsize_t has max size of:\t%lu", size_max);
+
+    
+    // Operators
+    
+    short int op1 = 10;
+    short int op2;
+    unsigned short int op3 = 30;
+    short int op4 = -100;
+    printf("\n\n\tOperators\n");
+    printf("We have: \n\tshort int op1 = %d; \n\tunsigned short int op3 = %u; \
+\n\tshort int op4 = %d;", op1, op3, op4);
+    printf("\nBasic Assignment: op1 = %d; op2 = op1;", op1);
+    op2 = op1;
+    printf(" => op2 = %d;", op2);
+    printf("\nAddition: op1 + op2 = %d;", op1 + op2);
+    printf("\nSubstraction: op1 - op2 = %d;", op1 - op2);
+    // unary (-/+) can also turn unsigned to signed
+    printf("\nUnary plus (integer promotion): +op3 = %d \
+\n\t(converted from unsigned to signed type)", +op3);
+    printf("\nUnary minus (additive inverse): -op3 = %d \
+\n\t(like unary plus, but also turned it negative)", -op3);
+    printf("\nMultiplication: op1 * op2 = %d", op1 * op2);
+    printf("\nDivision: op1 / op2 = %d", op1 / op2);
+    printf("\nModulo: op4 %% op3 = %d", (op4 % op3));
+    printf("\nIncrement Prefix: op1++: %d ; ", op1++); 
+    printf("op1 is now: %d", op1);
+    printf("\nIncrement Postfix: ++op1: %d ; ", ++op1);
+    printf("op1 is now: %d", op1);
+    printf("\nDecrement Prefix: op2--; %d ; ", op2--);
+    printf("op2 is now: %d", op2);
+    printf("\nDecrement Prefix: --op2; %d ; ", --op2);
+    printf("op2 is now: %d", op2);
+    
+    printf("\n\nEqual to: op1 == op2 (0 for false, 1 for true): %d", 
+            (op1 == op2));
+    printf("\nNot equal to: op1 != op2 (0 for false, 1 for true): %d", 
+            (op1 != op2));
+    printf("\nGreater than: op1 > op2 (0 for false, 1 for true): %d", 
+            (op1 > op2));
+    printf("\nGreater than or equal to: op1 >= op2 \
+(0 for false, 1 for true): %d", (op1 >= op2));
+    printf("\nLess than: op1 < op2 (0 for false, 1 for true): %d", 
+            (op1 < op2));
+    printf("\nLess than or equal to: op1 <= op2 \
+(0 for false, 1 for true): %d", (op1 <= op2));
+    printf("\n\nLogical negation (NOT): !(1): %d", !(1));
+    printf("\nLogical AND: (0 && 1): %d", (0 && 1));
+    printf("\nLogical OR: (0 || 1): %d", (0 || 1));
+    printf("\nBitwise NOT: ~(op1) : %d", ~(op1));
+    printf("\nBitwise AND: op1 & op2 : %d", (op1 & op2));
+    printf("\nBitwise OR: op1 | op2 : %d", (op1 | op2));
+    printf("\nBitwise XOR: op1 ^ op2 : %d", (op1 ^ op2));
+    printf("\nBitwise left shift: op1 << 3 (it's like op1*2**3) : %d", 
+            (op1 << 3));
+    printf("\nBitwise left shift: op3 >> 3 (it's like op3/2**3) : %d", 
+            op3 >> 3);
+    printf("\n\n\top1 = %d; op2 = %d; op3 = %d; op4 = %d", 
+            op1, op2, op3, op4);
+    printf("\n\nAddition assignment: op1 += op2 \n\
+\t(op1 = op1 + op2): \t%d", op1 += op2);
+    printf("\nSubstraction assignment: op1 -= op2 \n\
+\t(op1 = op1 - op2): \t%d", op1 -= op2);
+    printf("\nMultiplication assignment: op1 *= op2 \n\
+\t(op1 = op1 * op2): \t%d", op1 *= op2);
+    printf("\nDivision assignment: op1 /= op2 \n\
+\t(op1 = op1 / op2): \t%d", op1 /= op2);
+    printf("\nModulo assignment: op1 %%= op2 \n\
+\t(op1 = op1 %% op2): \t%d", op1 %= op2);
+    printf("\nBitwise AND assignment: op1 &= op2 \n\
+\t(op1 = op1 & op2): \t%d", op1 &= op2);
+    printf("\nBitwise OR assignment: op1 |= op2 \n\
+\t(op1 = op1 | op2): \t%d", op1 |= op2);
+    printf("\nBitwise XOR assignment: op1 ^= op2 \n\
+\t(op1 = op1 ^ op2): \t%d", op1 ^= op2);
+    printf("\nBitwise left shift assignment: op1 <<= op2 \n\
+\t(op1 = op1 << op2): \t%d", op1 <<= op2);
+    printf("\nBitwise right shift assignment: op1 >>= op2 \n\
+\t(op1 = op1 >> op2): \t%d", op1 >>= op2);
+    printf("\n\n\top1 = %d; op2 = %d; op3 = %d; op4 = %d\n", 
+            op1, op2, op3, op4);
+    printf("\nMember and pointer operators\n\tTODO\n");
     return 0;
 }
