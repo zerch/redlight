@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <signal.h>
 #include <wctype.h>
+#include <stdlib.h>
 
 int main (int argc, char **argv)
 {
@@ -331,6 +332,42 @@ int main (int argc, char **argv)
 \t(op1 = op1 >> op2): \t%d", op1 >>= op2);
     printf("\n\n\top1 = %d; op2 = %d; op3 = %d; op4 = %d\n", 
             op1, op2, op3, op4);
-    printf("\nMember and pointer operators\n\tTODO\n");
+    printf("\nMember and pointer operators\n");
+    int arr[5] = {0, 10, 14, 63, 107};
+    printf("\nArray arr = { ");
+    int i;
+    for (i = 0; i <= 4; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("}\nArray subscript: arr[3] = %d", arr[3]);
+    int *point;
+    point = &arr[3];
+    printf("\nIndirection(object pointed to by) %p", point);
+    printf("\nReference(address of) %p", &arr[2]);
+
+    struct struc {
+        int el1;
+        char el2;
+    };
+    
+    struct struc strucc;
+    struct struc *strucp = malloc(sizeof(struct struc));
+
+    strucc.el1 = 100;
+    strucp->el2 = 'a';
+    printf("\nStructure reference(member el1 of object strucc)\
+:\n\tstrucc.el1 = \t%d", strucc.el1);
+    printf("\nStructure dereference(member el1 of object pointed to by strucc)\
+:\n\tstrucp->el2 = \t%c", strucp->el2);
+    free(strucp);
+    printf("\n\nOther operators\n");
+    printf("Ternary conditional:  a ? b : c \n\t");
+    unsigned short int a = 1;
+    unsigned short int b = 10;
+    unsigned short int c = 20;
+    unsigned short int d = a ? b : c;
+    printf("a = %d; b = %d; c = %d; d = a ? b : c;\n", a, b, c);
+    printf("if \"a\" then \"b\", otherwise \"c\" : %d", d);
+
     return 0;
 }
